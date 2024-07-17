@@ -1,0 +1,66 @@
+[
+	{
+		"accountId": 1,
+		"id": "filter1000",
+		"name": "Filter 1",
+		"enable": true,
+		"operator": "allof",
+		"tests": [
+			{
+				"id": "filter1000-test1",
+				"field": "subject",
+				"operator": "contains",
+				"value": "Hello Hello"
+			},
+			{
+				"id": "filter1000-test2",
+				"field": "to",
+				"operator": "is",
+				"value": "bob@acme.org"
+			}
+		],
+		"actions": [
+			{
+				"id": "filter1000-action1",
+				"type": "addflag",
+				"flag": "Important"
+			},
+			{
+				"id": "filter1000-action2",
+				"type": "keep"
+			}
+		]
+	},
+	{
+		"accountId": 1,
+		"id": "filter2000",
+		"name": "Filter 2",
+		"enable": true,
+		"operator": "allof",
+		"tests": [
+			{
+				"id": "filter2000-test3",
+				"field": "subject",
+				"operator": "contains",
+				"value": "Hello Hello"
+			},
+			{
+				"id": "filter2000-test2",
+				"field": "to",
+				"operator": "is",
+				"value": "bob@acme.org"
+			}
+		],
+		"actions": [
+			{
+				"id": "filter2000-action1",
+				"type": "addflag",
+				"flag": "Important"
+			},
+			{
+				"id": "filter2000-action2",
+				"type": "keep"
+			}
+		]
+	}
+]
