@@ -13,7 +13,7 @@ use Horde_Imap_Client_Cache_Backend_Null;
 use Horde_Imap_Client_Password_Xoauth2;
 use Horde_Imap_Client_Socket;
 use OCA\Mail\Account;
-use OCA\Mail\Cache\Cache;
+use OCA\Mail\Cache\CacheFactory;
 use OCA\Mail\Events\BeforeImapClientCreated;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -40,17 +40,20 @@ class IMAPClientFactory {
 	private $eventDispatcher;
 
 	private ITimeFactory $timeFactory;
+	private CacheFactory $hordeCacheFactory;
 
 	public function __construct(ICrypto $crypto,
 		IConfig $config,
 		ICacheFactory $cacheFactory,
 		IEventDispatcher $eventDispatcher,
-		ITimeFactory $timeFactory) {
+		ITimeFactory $timeFactory,
+		CacheFactory $hordeCacheFactory) {
 		$this->crypto = $crypto;
 		$this->config = $config;
 		$this->cacheFactory = $cacheFactory;
 		$this->eventDispatcher = $eventDispatcher;
 		$this->timeFactory = $timeFactory;
+		$this->hordeCacheFactory = $hordeCacheFactory;
 	}
 
 	/**
@@ -113,10 +116,15 @@ class IMAPClientFactory {
 		);
 		if ($useCache && $this->cacheFactory->isAvailable()) {
 			$params['cache'] = [
-				'backend' => new Cache([
-					'cacheob' => $this->cacheFactory->createDistributed(md5((string)$account->getId())),
-				])];
+				'backend' => $this->hordeCacheFactory->newCache(
+					$account,
+					$this->cacheFactory->createDistributed(md5((string)$account->getId())),
+				),
+			];
 		} else {
+			// WARNING: This is very dangerous! We **will** miss changes when using QRESYNC without
+			//          actually persisting changes to the cache. Especially vanished messages will
+			//          be missed.
 			/**
 			 * If we don't use a cache we use a null cache to trick Horde into
 			 * using QRESYNC/CONDSTORE if they are available

@@ -13,7 +13,9 @@ namespace OCA\Mail\Cache;
 use Exception;
 use Horde_Imap_Client_Cache_Backend;
 use Horde_Imap_Client_Exception;
-use InvalidArgumentException;
+use OCA\Mail\Account;
+use OCA\Mail\Db\MailboxMapper;
+use OCA\Mail\Db\MessageMapper;
 use OCP\ICache;
 
 /**
@@ -21,12 +23,7 @@ use OCP\ICache;
  */
 class Cache extends Horde_Imap_Client_Cache_Backend {
 	/** Cache structure version. */
-	public const VERSION = 3;
-
-	/**
-	 * The cache object.
-	 */
-	protected ICache $_cache;
+	public const VERSION = 4;
 
 	/**
 	 * The working data for the current pageload.  All changes take place to
@@ -52,26 +49,24 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 	 */
 	protected array $_update = [];
 
-	/**
-	 * Constructor.
-	 *
-	 * @param array $params Configuration parameters:
-	 */
-	public function __construct(array $params = []) {
-		// Default parameters.
-		$params = array_merge([
-			'lifetime' => 604800,
-			'slicesize' => 50
-		], array_filter($params));
+	/** @var int[]|null **/
+	private ?array $cachedUids = null;
 
-		if (!isset($params['cacheob'])) {
-			throw new InvalidArgumentException('Missing cacheob parameter.');
-		}
+	private ?int $uidvalid = null;
 
-		foreach (['lifetime', 'slicesize'] as $val) {
-			$params[$val] = intval($params[$val]);
-		}
-
+	public function __construct(
+		private MessageMapper $messageMapper,
+		private MailboxMapper $mailboxMapper,
+		private Account $account,
+		private ICache $_cache,
+		int $lifetime = 604800,
+		int $slicesize = 50,
+	) {
+		$params = [
+			'lifetime' => $lifetime,
+			'slicesize' => $slicesize,
+			'cacheob' => $this->_cache,
+		];
 		parent::__construct($params);
 	}
 
@@ -164,13 +159,23 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 		return $ret;
 	}
 
-	/** {@inheritDoc} */
-	public function getCachedUids($mailbox, $uidvalid) {
-		$this->_loadSliceMap($mailbox, $uidvalid);
-		return array_unique(array_merge(
-			array_keys($this->_slicemap[$mailbox]['s']),
-			(isset($this->_update[$mailbox]) ? $this->_update[$mailbox]['add'] : [])
-		));
+	public function getCachedUids($mailbox, $uidvalid): array {
+		// Delete cached data of mailbox if uidvalid has changed
+		if ($this->uidvalid !== null && $uidvalid !== null && $this->uidvalid !== $uidvalid) {
+			$this->_deleteMailbox($mailbox);
+		}
+
+		// Refresh cached uids lazily
+		if ($this->cachedUids === null) {
+			$mailboxEntity = $this->mailboxMapper->find($this->account, $mailbox);
+			$this->cachedUids = $this->messageMapper->findAllUids($mailboxEntity);
+		}
+
+		if ($this->uidvalid === null && $uidvalid !== null) {
+			$this->uidvalid = $uidvalid;
+		}
+
+		return array_merge([], $this->cachedUids);
 	}
 
 	/**
@@ -235,12 +240,13 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 		$this->_toUpdate($mailbox, 'slicemap', true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @return void
-	 */
-	public function deleteMsgs($mailbox, $uids) {
+	public function deleteMsgs($mailbox, $uids): void {
+		// Delete uids from the db cache
+		$mailboxEntity = $this->mailboxMapper->find($this->account, $mailbox);
+		$this->messageMapper->deleteByUid($mailboxEntity, ...$uids);
+		$this->cachedUids = array_diff($this->cachedUids, $uids);
+
+		// Delete uids from the memory cache
 		$this->_loadSliceMap($mailbox);
 
 		$slicemap = &$this->_slicemap[$mailbox];
@@ -298,6 +304,8 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 	public function clear($lifetime) {
 		$this->_cache->clear();
 		$this->_data = $this->_loaded = $this->_slicemap = $this->_update = [];
+		$this->cachedUids = null;
+		$this->uidvalid = null;
 	}
 
 	/**
@@ -339,6 +347,9 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 			$this->_slicemap[$mbox],
 			$this->_update[$mbox]
 		);
+
+		$this->cachedUids = null;
+		$this->uidvalid = null;
 	}
 
 	/**
