@@ -103,6 +103,7 @@ class ImapToDbSynchronizer {
 	public function syncAccount(Account $account,
 		LoggerInterface $logger,
 		bool $force = false,
+		bool $useClientCache = true,
 		int $criteria = Horde_Imap_Client::SYNC_NEWMSGSUIDS | Horde_Imap_Client::SYNC_FLAGSUIDS | Horde_Imap_Client::SYNC_VANISHEDUIDS): void {
 		$rebuildThreads = false;
 		$trashMailboxId = $account->getMailAccount()->getTrashMailboxId();
@@ -126,7 +127,8 @@ class ImapToDbSynchronizer {
 				$criteria,
 				null,
 				$force,
-				true
+				true,
+				$useClientCache,
 			)) {
 				$rebuildThreads = true;
 			}
@@ -197,13 +199,14 @@ class ImapToDbSynchronizer {
 		int $criteria = Horde_Imap_Client::SYNC_NEWMSGSUIDS | Horde_Imap_Client::SYNC_FLAGSUIDS | Horde_Imap_Client::SYNC_VANISHEDUIDS,
 		?array $knownUids = null,
 		bool $force = false,
-		bool $batchSync = false): bool {
+		bool $batchSync = false,
+		bool $useClientCache = true): bool {
 		$rebuildThreads = true;
 		if ($mailbox->getSelectable() === false) {
 			return $rebuildThreads;
 		}
 
-		$client = $this->clientFactory->getClient($account);
+		$client = $this->clientFactory->getClient($account, $useClientCache);
 		$client->login(); // Need to login before fetching capabilities.
 
 		// There is no partial sync when using QRESYNC. As per RFC the client will always pull

@@ -121,18 +121,6 @@ class IMAPClientFactory {
 					$this->cacheFactory->createDistributed(md5((string)$account->getId())),
 				),
 			];
-		} else {
-			// WARNING: This is very dangerous! We **will** miss changes when using QRESYNC without
-			//          actually persisting changes to the cache. Especially vanished messages will
-			//          be missed.
-			/**
-			 * If we don't use a cache we use a null cache to trick Horde into
-			 * using QRESYNC/CONDSTORE if they are available
-			 * @see \Horde_Imap_Client_Socket::_loginTasks
-			 */
-			$params['cache'] = [
-				'backend' => new Horde_Imap_Client_Cache_Backend_Null(),
-			];
 		}
 		if ($this->config->getSystemValue('debug', false)) {
 			$params['debug'] = $this->config->getSystemValue('datadirectory') . '/horde_imap.log';
