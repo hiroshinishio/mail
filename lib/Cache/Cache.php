@@ -161,7 +161,7 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 
 	public function getCachedUids($mailbox, $uidvalid): array {
 		// Delete cached data of mailbox if uidvalid has changed
-		if ($this->uidvalid !== null && $uidvalid !== null && $this->uidvalid !== $uidvalid) {
+		if ($this->uidvalid !== null && $uidvalid !== null && $this->uidvalid !== (int)$uidvalid) {
 			$this->_deleteMailbox($mailbox);
 		}
 
@@ -172,7 +172,7 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 		}
 
 		if ($this->uidvalid === null && $uidvalid !== null) {
-			$this->uidvalid = $uidvalid;
+			$this->uidvalid = (int)$uidvalid;
 		}
 
 		return array_merge([], $this->cachedUids);
