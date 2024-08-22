@@ -102,7 +102,6 @@ class MailProvider implements IProvider {
 	 * @param string $serviceId			mail account id
 	 *
 	 * @return IService|null            returns service object or null if none found
-	 * @throws Exception
 	 *
 	 */
 	public function findServiceById(string $userId, string $serviceId): IService | null {
