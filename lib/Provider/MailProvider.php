@@ -30,31 +30,31 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string				id of this provider (e.g. UUID or 'IMAP/SMTP' or anything else)
+	 * @return string					id of this provider (e.g. UUID or 'IMAP/SMTP' or anything else)
 	 */
 	public function id(): string {
 		return 'mail-application';
 	}
 
 	/**
-	 * localized human frendly name of this provider
+	 * localized human friendly name of this provider
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string				label/name of this provider (e.g. Plain Old IMAP/SMTP)
+	 * @return string					label/name of this provider (e.g. Plain Old IMAP/SMTP)
 	 */
 	public function label(): string {
 		return 'Mail Application';
 	}
 
 	/**
-	 * determain if any services are configured for a specific user
+	 * determine if any services are configured for a specific user
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId		system user id
+	 * @param string $userId			system user id
 	 *
-	 * @return bool 				true if any services are configure for the user
+	 * @return bool 					true if any services are configure for the user
 	 */
 	public function hasServices(string $userId): bool {
 		return (count($this->listServices($userId)) > 0);
@@ -101,31 +101,31 @@ class MailProvider implements IProvider {
 	 * @param string $userId			system user id
 	 * @param string $serviceId			mail account id
 	 *
-	 * @return IService|null			returns service object or null if none found
+	 * @return IService|null            returns service object or null if none found
+	 * @throws Exception
+	 *
 	 */
 	public function findServiceById(string $userId, string $serviceId): IService | null {
-
-		// evaluate if id is a number
-		if (is_numeric($serviceId)) {
-			try {
-				// retrieve service details from data store
-				$account = $this->accountService->find($userId, (int) $serviceId);
-			} catch(\Throwable $th) {
-				return null;
-			}
-		}
-		// evaluate if service details where found
-		if ($account instanceof Account) {
-			// extract values
-			$serviceId = (string) $account->getId();
-			$label = $account->getName();
-			$address = new MailAddress($account->getEmail(), $account->getName());
-			// return mail service object
-			return new MailService($this->container, $userId, $serviceId, $label, $address);
-		}
-
-		return null;
 		
+		// determine if a valid user and service id was submitted
+		if (empty($userId) && !ctype_digit($serviceId)) {
+			return null;
+		}
+
+		try {
+			// retrieve service details from data store
+			$account = $this->accountService->find($userId, (int) $serviceId);
+		} catch(\Throwable $th) {
+			return null;
+		}
+
+		// extract values
+		$serviceId = (string) $account->getId();
+		$label = $account->getName();
+		$address = new MailAddress($account->getEmail(), $account->getName());
+		// return mail service object
+		return new MailService($this->container, $userId, $serviceId, $label, $address);
+
 	}
 
 	/**
@@ -147,7 +147,7 @@ class MailProvider implements IProvider {
 			return null;
 		}
 		// evaluate if service details where found
-		if (count($accounts) > 0 && $accounts[0] instanceof Account) {
+		if (isset($accounts[0])) {
 			// extract values
 			$serviceId = (string) $accounts[0]->getId();
 			$label = $accounts[0]->getName();
@@ -163,9 +163,9 @@ class MailProvider implements IProvider {
 	/**
 	 * construct a new fresh service object
 	 *
-	 * @since 30.0.0
+	 * @since 4.0.0
 	 *
-	 * @return IService					fresh service object
+	 * @return IService						fresh service object
 	 */
 	public function initiateService(): IService {
 

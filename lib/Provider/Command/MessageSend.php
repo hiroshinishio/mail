@@ -101,23 +101,20 @@ class MessageSend {
 	}
 
 	/**
-	 * converts IAddess objects collection to plain array
+	 * Converts IAddress objects collection to plain array
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param array<int,IAddress> $in	collection of IAddress objects
+	 * @param array<int,IAddress> $addresses		collection of IAddress objects
 	 *
-	 * @return array<int,array>			returns [['email' => 'test@example.com', 'label' => 'Test User']]
+	 * @return array<int,array{email: string, label?: string}>
 	 */
-	protected function convertAddressArray(array|null $in): array {
-		// construct place holder
-		$out = [];
-		// convert format
-		foreach ($in as $entry) {
-			$out[] = (!empty($entry->getLabel())) ? ['email' => $entry->getAddress(), 'label' => $entry->getLabel()] : ['email' => $entry->getAddress()];
-		}
-		// return converted addresses
-		return $out;
+	protected function convertAddressArray(array $addresses): array {
+		return array_map(static function (IAddress $address) {
+			return !empty($address->getLabel())
+				? ['email' => $address->getAddress(), 'label' => $address->getLabel()]
+				: ['email' => $address->getAddress()];
+		}, $addresses);
 	}
 
 }
