@@ -192,7 +192,7 @@ class MailService implements IService, IMessageSend {
 	 */
 	public function sendMessage(IMessage $message, array $option = []): void {
 
-		/** @var MessageSend $cmd */
+		/** @var \OCA\Mail\Provider\Command\MessageSend $cmd */
 		$cmd = $this->container->get(\OCA\Mail\Provider\Command\MessageSend::class);
 		// perform action
 		$cmd->perform($this->userId, $this->serviceId, $message, $option);
