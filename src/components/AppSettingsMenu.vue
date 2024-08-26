@@ -279,6 +279,16 @@
 					</div>
 				</dl>
 			</NcAppSettingsSection>
+			<NcAppSettingsSection id="mailbox_settings" :name="t('mail', 'Account settings')">
+				<NcButton class="app-settings-button"
+					type="primary"
+					@click="openAccountSettings">
+					{{ t('mail', 'Open Account Settings') }}
+				</NcButton>
+				<AccountSettings v-if="account"
+					:open.sync="showAccountSettings"
+					:account="account" />
+			</NcAppSettingsSection>
 		</NcAppSettingsDialog>
 	</div>
 </template>
@@ -299,6 +309,7 @@ import Logger from '../logger.js'
 import SmimeCertificateModal from './smime/SmimeCertificateModal.vue'
 import TrustedSenders from './TrustedSenders.vue'
 import InternalAddress from './InternalAddress.vue'
+import AccountSettings from './AccountSettings.vue'
 import isMobile from '@nextcloud/vue/dist/Mixins/isMobile.js'
 import { mapGetters } from 'vuex'
 
@@ -307,6 +318,7 @@ export default {
 	components: {
 		TrustedSenders,
 		InternalAddress,
+		AccountSettings,
 		NcButton,
 		IconEmail,
 		IconAdd,
@@ -347,6 +359,8 @@ export default {
 			displaySmimeCertificateModal: false,
 			sortOrder: 'newest',
 			showSettings: false,
+			showAccountSettings: false,
+			showMailSettings: true,
 			mailvelopeIsAvailable: false,
 		}
 	},
@@ -354,6 +368,9 @@ export default {
 		...mapGetters([
 			'isFollowUpFeatureAvailable',
 		]),
+/* 		account() {
+			return this.$store.getters.getAccount(this.accountId)
+		}, */
 		searchPriorityBody() {
 			return this.$store.getters.getPreference('search-priority-body', 'false') === 'true'
 		},
@@ -402,6 +419,10 @@ export default {
 		this.checkMailvelope()
 	},
 	methods: {
+		openAccountSettings() {
+			this.showMailSettings = false
+			this.showAccountSettings = true
+		},
 		checkMailvelope() {
 			this.mailvelopeIsAvailable = !!window.mailvelope
 		},
