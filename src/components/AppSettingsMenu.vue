@@ -281,11 +281,11 @@
 			</NcAppSettingsSection>
 			<NcAppSettingsSection id="mailbox_settings" :name="t('mail', 'Account settings')">
 				<li v-for="account in accounts" :key="account.id">
-				<NcButton class="app-settings-button"
-					type="primary"
-					@click="openAccountSettings(account.id)">
-					{{ account.emailAddress }}
-				</NcButton>
+					<NcButton class="app-settings-button"
+						type="primary"
+						@click="openAccountSettings(account.id)">
+						{{ account.emailAddress }}
+					</NcButton>
 				</li>
 				<AccountSettings v-if="selectedAccount"
 					:open.sync="showAccountSettings"
