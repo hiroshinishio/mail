@@ -16,8 +16,8 @@ use OCP\ICache;
 
 class CacheFactory {
 	public function __construct(
-		private readonly MailboxMapper $mailboxMapper,
-		private readonly MessageMapper $messageMapper,
+		private MailboxMapper $mailboxMapper,
+		private MessageMapper $messageMapper,
 	) {
 	}
 

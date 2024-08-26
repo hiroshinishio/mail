@@ -244,7 +244,9 @@ class Cache extends Horde_Imap_Client_Cache_Backend {
 		// Delete uids from the db cache
 		$mailboxEntity = $this->mailboxMapper->find($this->account, $mailbox);
 		$this->messageMapper->deleteByUid($mailboxEntity, ...$uids);
-		$this->cachedUids = array_diff($this->cachedUids, $uids);
+		if ($this->cachedUids !== null) {
+			$this->cachedUids = array_diff($this->cachedUids, $uids);
+		}
 
 		// Delete uids from the memory cache
 		$this->_loadSliceMap($mailbox);
