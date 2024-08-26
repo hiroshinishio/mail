@@ -34,16 +34,16 @@ class MessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
-	 * @param string $serviceId			mail account id
-	 * @param IMessage $message			mail message object with all required parameters to send a message
-	 * @param array $options			array of options reserved for future use
+	 * @param string $userId system user id
+	 * @param string $serviceId mail account id
+	 * @param IMessage $message mail message object with all required parameters to send a message
+	 * @param array $options array of options reserved for future use
 	 *
 	 * @return LocalMessage
 	 */
 	public function perform(string $userId, string $serviceId, IMessage $message, array $option = []): LocalMessage {
 		// find user mail account details
-		$account = $this->accountService->find($userId, (int) $serviceId);
+		$account = $this->accountService->find($userId, (int)$serviceId);
 		// convert mail provider message to mail app message
 		$localMessage = new LocalMessage();
 		$localMessage->setType($localMessage::TYPE_OUTGOING);
@@ -62,7 +62,7 @@ class MessageSend {
 			foreach ($message->getAttachments() as $entry) {
 				// determine if required parameters are set
 				if (empty($entry->getName()) || empty($entry->getType()) || empty($entry->getContents())) {
-					throw new SendException("Invalid Attachment Parameter: MUST contain values for Name, Type and Contents");
+					throw new SendException('Invalid Attachment Parameter: MUST contain values for Name, Type and Contents');
 				}
 				// convert mail provider attachment to mail app attachment
 				$attachments[] = $this->attachmentService->addFileFromString(
@@ -75,7 +75,7 @@ class MessageSend {
 		}
 		// determine if required To address is set
 		if (empty($message->getTo()) || empty($message->getTo()[0]->getAddress())) {
-			throw new SendException("Invalid Message Parameter: MUST contain at least one TO address with a valid address");
+			throw new SendException('Invalid Message Parameter: MUST contain at least one TO address with a valid address');
 		}
 		// convert recipient addresses
 		$to = $this->convertAddressArray($message->getTo());
@@ -105,7 +105,7 @@ class MessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param array<int,IAddress> $addresses		collection of IAddress objects
+	 * @param array<int,IAddress> $addresses collection of IAddress objects
 	 *
 	 * @return array<int,array{email: string, label?: string}>
 	 */

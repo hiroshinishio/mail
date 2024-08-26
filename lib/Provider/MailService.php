@@ -37,7 +37,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string					id of this service (e.g. 1 or service1 or anything else)
+	 * @return string id of this service (e.g. 1 or service1 or anything else)
 	 */
 	public function id(): string {
 
@@ -50,15 +50,15 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $value				required ability e.g. 'MessageSend'
+	 * @param string $value required ability e.g. 'MessageSend'
 	 *
-	 * @return bool						true/false if ability is supplied and found in collection
+	 * @return bool true/false if ability is supplied and found in collection
 	 */
 	public function capable(string $value): bool {
 
 		// evaluate if required ability exists
 		if (isset($this->serviceAbilities[$value])) {
-			return (bool) $this->serviceAbilities[$value];
+			return (bool)$this->serviceAbilities[$value];
 		}
 		
 		return false;
@@ -70,7 +70,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return array					collection of abilities otherwise empty collection
+	 * @return array collection of abilities otherwise empty collection
 	 */
 	public function capabilities(): array {
 
@@ -83,7 +83,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string					label/name of service (e.g. ACME Company Mail Service)
+	 * @return string label/name of service (e.g. ACME Company Mail Service)
 	 */
 	public function getLabel(): string {
 
@@ -96,9 +96,9 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $value				label/name of service (e.g. ACME Company Mail Service)
+	 * @param string $value label/name of service (e.g. ACME Company Mail Service)
 	 *
-	 * @return self                     return this object for command chaining
+	 * @return self return this object for command chaining
 	 */
 	public function setLabel(string $value): self {
 
@@ -112,7 +112,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return IAddress					mail address object
+	 * @return IAddress mail address object
 	 */
 	public function getPrimaryAddress(): IAddress {
 
@@ -126,9 +126,9 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param IAddress $value			mail address object
+	 * @param IAddress $value mail address object
 	 *
-	 * @return self                     return this object for command chaining
+	 * @return self return this object for command chaining
 	 */
 	public function setPrimaryAddress(IAddress $value): self {
 
@@ -142,7 +142,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return array<int, IAddress>		collection of mail address object [IAddress, IAddress]
+	 * @return array<int, IAddress> collection of mail address object [IAddress, IAddress]
 	 */
 	public function getSecondaryAddresses(): array {
 
@@ -156,9 +156,9 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param IAddress ...$value		collection of one or more mail address object
+	 * @param IAddress ...$value collection of one or more mail address object
 	 *
-	 * @return self                     return this object for command chaining
+	 * @return self return this object for command chaining
 	 */
 	public function setSecondaryAddresses(IAddress ...$value): self {
 
@@ -172,7 +172,7 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 30.0.0
 	 *
-	 * @return IMessage					fresh message object
+	 * @return IMessage fresh message object
 	 */
 	public function initiateMessage(): IMessage {
 
@@ -185,8 +185,8 @@ class MailService implements IService, IMessageSend {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param IMessage $message			mail message object with all required parameters to send a message
-	 * @param array $options			array of options reserved for future use
+	 * @param IMessage $message mail message object with all required parameters to send a message
+	 * @param array $options array of options reserved for future use
 	 *
 	 * @throws \OCP\Mail\Provider\Exception\SendException on failure, check message for reason
 	 */

@@ -30,7 +30,7 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string					id of this provider (e.g. UUID or 'IMAP/SMTP' or anything else)
+	 * @return string id of this provider (e.g. UUID or 'IMAP/SMTP' or anything else)
 	 */
 	public function id(): string {
 		return 'mail-application';
@@ -41,7 +41,7 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return string					label/name of this provider (e.g. Plain Old IMAP/SMTP)
+	 * @return string label/name of this provider (e.g. Plain Old IMAP/SMTP)
 	 */
 	public function label(): string {
 		return 'Mail Application';
@@ -52,9 +52,9 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
+	 * @param string $userId system user id
 	 *
-	 * @return bool 					true if any services are configure for the user
+	 * @return bool true if any services are configure for the user
 	 */
 	public function hasServices(string $userId): bool {
 		return (count($this->listServices($userId)) > 0);
@@ -65,9 +65,9 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
+	 * @param string $userId system user id
 	 *
-	 * @return array<string,IService>	collection of service id and object ['1' => IServiceObject]
+	 * @return array<string,IService> collection of service id and object ['1' => IServiceObject]
 	 */
 	public function listServices(string $userId): array {
 
@@ -82,7 +82,7 @@ class MailProvider implements IProvider {
 		// add services to collection
 		foreach ($accounts as $entry) {
 			// extract values
-			$serviceId = (string) $entry->getId();
+			$serviceId = (string)$entry->getId();
 			$label = $entry->getName();
 			$address = new MailAddress($entry->getEmail(), $entry->getName());
 			// add service to collection
@@ -98,13 +98,13 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
-	 * @param string $serviceId			mail account id
+	 * @param string $userId system user id
+	 * @param string $serviceId mail account id
 	 *
-	 * @return IService|null            returns service object or null if none found
+	 * @return IService|null returns service object or null if none found
 	 *
 	 */
-	public function findServiceById(string $userId, string $serviceId): IService | null {
+	public function findServiceById(string $userId, string $serviceId): IService|null {
 		
 		// determine if a valid user and service id was submitted
 		if (empty($userId) && !ctype_digit($serviceId)) {
@@ -113,13 +113,13 @@ class MailProvider implements IProvider {
 
 		try {
 			// retrieve service details from data store
-			$account = $this->accountService->find($userId, (int) $serviceId);
+			$account = $this->accountService->find($userId, (int)$serviceId);
 		} catch(\Throwable $th) {
 			return null;
 		}
 
 		// extract values
-		$serviceId = (string) $account->getId();
+		$serviceId = (string)$account->getId();
 		$label = $account->getName();
 		$address = new MailAddress($account->getEmail(), $account->getName());
 		// return mail service object
@@ -132,12 +132,12 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
-	 * @param string $address			mail address (e.g. test@example.com)
+	 * @param string $userId system user id
+	 * @param string $address mail address (e.g. test@example.com)
 	 *
-	 * @return IService|null			returns service object or null if none found
+	 * @return IService|null returns service object or null if none found
 	 */
-	public function findServiceByAddress(string $userId, string $address): IService | null {
+	public function findServiceByAddress(string $userId, string $address): IService|null {
 
 		try {
 			// retrieve service details from data store
@@ -148,7 +148,7 @@ class MailProvider implements IProvider {
 		// evaluate if service details where found
 		if (isset($accounts[0])) {
 			// extract values
-			$serviceId = (string) $accounts[0]->getId();
+			$serviceId = (string)$accounts[0]->getId();
 			$serviceLabel = $accounts[0]->getName();
 			$serviceAddress = new MailAddress($accounts[0]->getEmail(), $accounts[0]->getName());
 			// return mail service object
@@ -164,7 +164,7 @@ class MailProvider implements IProvider {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @return IService						fresh service object
+	 * @return IService fresh service object
 	 */
 	public function initiateService(): IService {
 
