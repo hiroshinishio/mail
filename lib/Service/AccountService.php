@@ -93,7 +93,7 @@ class AccountService {
 	public function findByUserIdAndAddress(string $userId, string $address): array {
 		// evaluate if cached accounts collection already exists
 		if (isset($this->accounts[$userId])) {
-			// initialize tempory collection
+			// initialize temporary collection
 			$list = [];
 			// iterate through accounts and find accounts matching mail address
 			foreach ($this->accounts[$userId] as $account) {

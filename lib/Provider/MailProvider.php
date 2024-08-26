@@ -135,7 +135,7 @@ class MailProvider implements IProvider {
 	 * @param string $userId			system user id
 	 * @param string $address			mail address (e.g. test@example.com)
 	 *
-	 * @return IService					returns service object or null if none found
+	 * @return IService|null			returns service object or null if none found
 	 */
 	public function findServiceByAddress(string $userId, string $address): IService | null {
 
@@ -149,10 +149,10 @@ class MailProvider implements IProvider {
 		if (isset($accounts[0])) {
 			// extract values
 			$serviceId = (string) $accounts[0]->getId();
-			$label = $accounts[0]->getName();
-			$address = new MailAddress($accounts[0]->getEmail(), $accounts[0]->getName());
+			$serviceLabel = $accounts[0]->getName();
+			$serviceAddress = new MailAddress($accounts[0]->getEmail(), $accounts[0]->getName());
 			// return mail service object
-			return new MailService($this->container, $userId, $serviceId, $label, $address);
+			return new MailService($this->container, $userId, $serviceId, $serviceLabel, $serviceAddress);
 		}
 
 		return null;
