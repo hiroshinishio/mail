@@ -280,14 +280,16 @@
 				</dl>
 			</NcAppSettingsSection>
 			<NcAppSettingsSection id="mailbox_settings" :name="t('mail', 'Account settings')">
+				<li v-for="account in accounts" :key="account.id">
 				<NcButton class="app-settings-button"
 					type="primary"
-					@click="openAccountSettings">
-					{{ t('mail', 'Open Account Settings') }}
+					@click="openAccountSettings(account.id)">
+					{{ account.emailAddress }}
 				</NcButton>
-				<AccountSettings v-if="account"
+				</li>
+				<AccountSettings v-if="selectedAccount"
 					:open.sync="showAccountSettings"
-					:account="account" />
+					:account="selectedAccount" />
 			</NcAppSettingsSection>
 		</NcAppSettingsDialog>
 	</div>
@@ -361,6 +363,7 @@ export default {
 			showSettings: false,
 			showAccountSettings: false,
 			showMailSettings: true,
+			selectedAccount: null,
 			mailvelopeIsAvailable: false,
 		}
 	},
@@ -368,9 +371,9 @@ export default {
 		...mapGetters([
 			'isFollowUpFeatureAvailable',
 		]),
-/* 		account() {
-			return this.$store.getters.getAccount(this.accountId)
-		}, */
+		...mapGetters({
+			accounts: 'accounts',
+		}),
 		searchPriorityBody() {
 			return this.$store.getters.getPreference('search-priority-body', 'false') === 'true'
 		},
@@ -419,9 +422,10 @@ export default {
 		this.checkMailvelope()
 	},
 	methods: {
-		openAccountSettings() {
-			this.showMailSettings = false
+		openAccountSettings(account) {
+			this.selectedAccount = account
 			this.showAccountSettings = true
+			this.showMailSettings = false
 		},
 		checkMailvelope() {
 			this.mailvelopeIsAvailable = !!window.mailvelope
