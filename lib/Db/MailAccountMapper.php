@@ -88,8 +88,8 @@ class MailAccountMapper extends QBMapper {
 	 *
 	 * @since 4.0.0
 	 *
-	 * @param string $userId			system user id
-	 * @param string $address			mail address (e.g. test@example.com)
+	 * @param string $userId system user id
+	 * @param string $address mail address (e.g. test@example.com)
 	 *
 	 * @return MailAccount[]
 	 *

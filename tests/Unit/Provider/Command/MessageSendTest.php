@@ -26,17 +26,17 @@ use OCP\Mail\Provider\Message;
 
 class MessageSendTest extends TestCase {
 
-	/** @var IConfig&MockObject*/
+	/** @var IConfig&MockObject */
 	private $config;
-	/** @var ITimeFactory&MockObject*/
+	/** @var ITimeFactory&MockObject */
 	private $time;
-	/** @var AccountService&MockObject*/
+	/** @var AccountService&MockObject */
 	private $accountService;
-	/** @var OutboxService&MockObject*/
+	/** @var OutboxService&MockObject */
 	private $outboxService;
-	/** @var AttachmentService&MockObject*/
+	/** @var AttachmentService&MockObject */
 	private $attachmentService;
-	/** @var AccountService&MockObject*/
+	/** @var AccountService&MockObject */
 	private $commandSend;
 
 	protected function setUp(): void {
@@ -110,12 +110,12 @@ class MessageSendTest extends TestCase {
 		$localAttachmentReturned = LocalAttachment::fromParams($localAttachmentReturned);
 		// define attachment service returns
 		$this->attachmentService->expects($this->once())->method('addFileFromString')
-		->with(
-			'user1',
-			$this->mailAttachment->getName(),
-			$this->mailAttachment->getType(),
-			$this->mailAttachment->getContents()
-		)->willReturn($localAttachmentReturned);
+			->with(
+				'user1',
+				$this->mailAttachment->getName(),
+				$this->mailAttachment->getType(),
+				$this->mailAttachment->getContents()
+			)->willReturn($localAttachmentReturned);
 		// construct mail app message objects
 		$localMessageFresh = $this->localMessageData;
 		$localMessageFresh['sendAt'] = $this->time->getTime($localMessageFresh);
@@ -127,14 +127,14 @@ class MessageSendTest extends TestCase {
 		$localMessageReturned = LocalMessage::fromParams($localMessageReturned);
 		// define attachment service returns
 		$this->outboxService->expects($this->once())->method('saveMessage')
-		->with(
-			$this->localAccount,
-			$localMessageFresh,
-			[['email' => 'user2@testing.com', 'label' => 'User Two']],
-			[],
-			[],
-			[$localAttachmentReturned->jsonSerialize()]
-		)->willReturn($localMessageReturned);
+			->with(
+				$this->localAccount,
+				$localMessageFresh,
+				[['email' => 'user2@testing.com', 'label' => 'User Two']],
+				[],
+				[],
+				[$localAttachmentReturned->jsonSerialize()]
+			)->willReturn($localMessageReturned);
 		// construct mail provider message with attachment
 		$mailMessage = $this->mailMessage;
 		$mailMessage->setAttachments($this->mailAttachment);
@@ -162,14 +162,14 @@ class MessageSendTest extends TestCase {
 		$localMessageReturned = LocalMessage::fromParams($localMessageReturned);
 		// define attachment service returns
 		$this->outboxService->expects($this->once())->method('saveMessage')
-		->with(
-			$this->localAccount,
-			$localMessageFresh,
-			[['email' => 'user2@testing.com', 'label' => 'User Two']],
-			[],
-			[],
-			[]
-		)->willReturn($localMessageReturned);
+			->with(
+				$this->localAccount,
+				$localMessageFresh,
+				[['email' => 'user2@testing.com', 'label' => 'User Two']],
+				[],
+				[],
+				[]
+			)->willReturn($localMessageReturned);
 		// construct mail provider message
 		$mailMessage = $this->mailMessage;
 		// test send message

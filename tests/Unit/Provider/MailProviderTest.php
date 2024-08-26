@@ -20,9 +20,9 @@ use Psr\Container\ContainerInterface;
 
 class MailProviderTest extends TestCase {
 
-	/** @var ContainerInterfaceMockObject*/
+	/** @var ContainerInterfaceMockObject */
 	private $containerInterface;
-	/** @var AccountServiceMockObject*/
+	/** @var AccountServiceMockObject */
 	private $accountService;
 
 	protected function setUp(): void {
@@ -69,16 +69,16 @@ class MailProviderTest extends TestCase {
 		]));
 		// define account services find
 		$this->accountService
-		->expects($this->any())
-		->method('findByUserId')
-		->will(
-			$this->returnValueMap(
-				[
-					['user0', []],
-					['user1', [100 => $mailAccount]]
-				]
-			)
-		);
+			->expects($this->any())
+			->method('findByUserId')
+			->will(
+				$this->returnValueMap(
+					[
+						['user0', []],
+						['user1', [100 => $mailAccount]]
+					]
+				)
+			);
 		// construct mail provider
 		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
 		// test result with no services found
@@ -114,16 +114,16 @@ class MailProviderTest extends TestCase {
 		);
 		// define account services find
 		$this->accountService
-		->expects($this->any())
-		->method('findByUserId')
-		->will(
-			$this->returnValueMap(
-				[
-					['user0', []],
-					['user1', [$mailAccount]]
-				]
-			)
-		);
+			->expects($this->any())
+			->method('findByUserId')
+			->will(
+				$this->returnValueMap(
+					[
+						['user0', []],
+						['user1', [$mailAccount]]
+					]
+				)
+			);
 		// construct mail provider
 		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
 		// test result with no services found
@@ -159,16 +159,16 @@ class MailProviderTest extends TestCase {
 		);
 		// define account services find
 		$this->accountService
-		->expects($this->any())
-		->method('find')
-		->will(
-			$this->returnValueMap(
-				[
-					['user0', 100, $this->throwException(new ClientException())],
-					['user1', 100, $mailAccount]
-				]
-			)
-		);
+			->expects($this->any())
+			->method('find')
+			->will(
+				$this->returnValueMap(
+					[
+						['user0', 100, $this->throwException(new ClientException())],
+						['user1', 100, $mailAccount]
+					]
+				)
+			);
 		// construct mail provider
 		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
 		// test result with no services found
@@ -204,16 +204,16 @@ class MailProviderTest extends TestCase {
 		);
 		// define account services find
 		$this->accountService
-		->expects($this->any())
-		->method('findByUserIdAndAddress')
-		->will(
-			$this->returnValueMap(
-				[
-					['user0', 'user0@testing.com', $this->throwException(new ClientException())],
-					['user1', 'user1@testing.com', [$mailAccount]]
-				]
-			)
-		);
+			->expects($this->any())
+			->method('findByUserIdAndAddress')
+			->will(
+				$this->returnValueMap(
+					[
+						['user0', 'user0@testing.com', $this->throwException(new ClientException())],
+						['user1', 'user1@testing.com', [$mailAccount]]
+					]
+				)
+			);
 		// construct mail provider
 		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
 		// test result with no services found

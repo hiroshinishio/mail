@@ -14,9 +14,9 @@ use OCP\Mail\Provider\Address;
 use Psr\Container\ContainerInterface;
 
 class MailServiceTest extends TestCase {
-	/** @var MailService*/
+	/** @var MailService */
 	private $mailService;
-	/** @var Address*/
+	/** @var Address */
 	private $primaryAddress;
 
 	protected function setUp(): void {
