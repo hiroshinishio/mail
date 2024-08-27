@@ -425,8 +425,10 @@ export default {
 			this.showAccountSettings = false
 		},
 		openAccountSettings(accountId) {
-			this.selectedAccount = this.selectedAccount = this.accounts.find(account => account.id === accountId)
+			this.selectedAccount = this.accounts = this.accounts.find(account => account.id === accountId)
+			console.debug('modal closed?')
 			this.showMailSettings = false
+			console.debug('account settings open')
 			this.showAccountSettings = true
 		},
 		checkMailvelope() {
