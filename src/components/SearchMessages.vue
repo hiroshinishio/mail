@@ -13,7 +13,7 @@
 				@click="toggleButtons">
 			<NcButton type="tertiary" class="search-messages--filter" @click="moreSearchActions = true">
 				<template #icon>
-					<Tune :size="20" />
+					<FilterIcon :size="20" />
 				</template>
 			</NcButton>
 			<NcButton v-if="filterChanged"
@@ -297,6 +297,7 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcCheckboxRadioSwitch
 	from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import Tune from 'vue-material-design-icons/Tune.vue'
+import FilterIcon from 'vue-material-design-icons/Filter.vue'
 import Close from 'vue-material-design-icons/Close.vue'
 import IconClose from '@mdi/svg/svg/close.svg'
 import IconMagnify from '@mdi/svg/svg/magnify.svg'
