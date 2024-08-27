@@ -89,6 +89,7 @@ class FilterBuilder {
 			self::SEPARATOR,
 			self::DATA_MARKER . $stateJsonString,
 			...$commands,
+			self::SEPARATOR,
 		];
 
 		return implode("\r\n", array_merge(
