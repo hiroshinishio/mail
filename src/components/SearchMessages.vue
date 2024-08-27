@@ -295,8 +295,7 @@ import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcDateTimePicker from '@nextcloud/vue/dist/Components/NcDateTimePicker.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcCheckboxRadioSwitch
-	from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import Tune from 'vue-material-design-icons/Tune.vue'
+from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import FilterIcon from 'vue-material-design-icons/Filter.vue'
 import Close from 'vue-material-design-icons/Close.vue'
 import IconClose from '@mdi/svg/svg/close.svg'
@@ -318,7 +317,7 @@ export default {
 		NcDateTimePicker,
 		NcButton,
 		NcCheckboxRadioSwitch,
-		Tune,
+		FilterIcon,
 		Close,
 	},
 	props: {
