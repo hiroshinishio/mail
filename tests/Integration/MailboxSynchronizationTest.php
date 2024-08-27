@@ -11,17 +11,19 @@ namespace OCA\Mail\Tests\Integration;
 
 use Horde_Imap_Client;
 use Horde_Imap_Client_Socket;
-use OC\Memcache\ArrayCache;
 use OC\Memcache\Factory;
+use OC\Memcache\Redis;
 use OCA\Mail\Account;
 use OCA\Mail\Contracts\IMailManager;
 use OCA\Mail\Controller\MailboxesController;
 use OCA\Mail\Db\MessageMapper;
 use OCA\Mail\Service\AccountService;
 use OCA\Mail\Service\Sync\SyncService;
+use OCA\Mail\Tests\Integration\Framework\Caching;
 use OCA\Mail\Tests\Integration\Framework\ImapTest;
 use OCA\Mail\Tests\Integration\Framework\ImapTestAccount;
 use OCP\ICacheFactory;
+use OCP\IConfig;
 use OCP\IRequest;
 use OCP\Profiler\IProfiler;
 use OCP\Server;
@@ -43,27 +45,27 @@ class MailboxSynchronizationTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		// Simulate proper distributed cache via shared array cache instance
+		/*
+		// Force usage of a real cache. The original service closure is hard-coded to always return
+		// an instance of ArrayCache when the global PHPUNIT_RUN is defined.
 		\OC::$server->registerService(
 			ICacheFactory::class,
 			function () {
-				$cacheFactory = $this->getMockBuilder(Factory::class)
-					->setConstructorArgs([
-						'globalPrefix',
-						Server::get(LoggerInterface::class),
-						Server::get(IProfiler::class),
-						ArrayCache::class,
-						ArrayCache::class,
-						ArrayCache::class,
-					])
-					->setMethods(['createDistributed'])
-					->getMock();
-				$cacheFactory->method('createDistributed')
-					->willReturn(new ArrayCache());
-				return $cacheFactory;
+				$config = Server::get(IConfig::class);
+				return new Factory(
+					'mail-integration-tests',
+					Server::get(LoggerInterface::class),
+					Server::get(IProfiler::class),
+					$config->getSystemValue('memcache.local', null),
+					$config->getSystemValue('memcache.distributed', null),
+					$config->getSystemValue('memcache.locking', null),
+					$config->getSystemValueString('redis_log_file')
+				);
 			},
 			true,
 		);
+		*/
+		Caching::registerConfiguredCache();
 
 		$this->foldersController = new MailboxesController(
 			'mail',
@@ -250,6 +252,18 @@ class MailboxSynchronizationTest extends TestCase {
 	}
 
 	public function testUnsolicitedVanishedMessage() {
+		$config = Server::get(IConfig::class);
+		$cacheClass = $config->getSystemValueString('memcache.distributed');
+		if (ltrim($cacheClass, '\\') !== Redis::class) {
+			$this->markTestSkipped('Redis not available. Found ' . $cacheClass);
+		}
+
+		// Just to be sure ...
+		$cache = Server::get(ICacheFactory::class)->createDistributed();
+		$this->assertInstanceOf(Redis::class, $cache);
+
+		$cache->clear();
+
 		$mailbox = 'INBOX';
 		$message = $this->getMessageBuilder()
 			->from('ralph@buffington@domain.tld')
@@ -282,6 +296,15 @@ class MailboxSynchronizationTest extends TestCase {
 			false,
 			null,
 			[]
+		);
+
+		$syncService->syncMailbox(
+			new Account($this->account),
+			$inbox,
+			Horde_Imap_Client::SYNC_NEWMSGSUIDS | Horde_Imap_Client::SYNC_FLAGSUIDS | Horde_Imap_Client::SYNC_VANISHEDUIDS,
+			true,
+			null,
+			null,
 		);
 
 		// Assert that there are 2 messages and nothing changes when deleting a message externally
