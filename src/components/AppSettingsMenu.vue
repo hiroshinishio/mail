@@ -288,8 +288,9 @@
 					</NcButton>
 				</li>
 				<AccountSettings v-if="selectedAccount"
-					:open.sync="showAccountSettings"
-					:account="selectedAccount" />
+								 :open.sync="showAccountSettings"
+								 :account="selectedAccount"
+								 @close="closeAccountSettings" />
 			</NcAppSettingsSection>
 		</NcAppSettingsDialog>
 	</div>
@@ -339,6 +340,10 @@ export default {
 		open: {
 			required: true,
 			type: Boolean,
+		},
+		account: {
+			type: Object,
+			required: true,
 		},
 	},
 	data() {
@@ -422,10 +427,13 @@ export default {
 		this.checkMailvelope()
 	},
 	methods: {
-		openAccountSettings(account) {
-			this.selectedAccount = account
-			this.showAccountSettings = true
+		closeAccountSettings() {
+			this.showAccountSettings = false
+		},
+		openAccountSettings(accountId) {
+			this.selectedAccount = this.selectedAccount = this.accounts.find(account => account.id === accountId)
 			this.showMailSettings = false
+			this.showAccountSettings = true
 		},
 		checkMailvelope() {
 			this.mailvelopeIsAvailable = !!window.mailvelope
