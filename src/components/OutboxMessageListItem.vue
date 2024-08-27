@@ -151,7 +151,7 @@ export default {
 				failed: false,
 				sendAt: (new Date().getTime() + UNDO_DELAY) / 1000,
 			}
-			await this.outboxStore.updateMessage({ message, id: message.id })
+			await this.outboxStore.sendMessage({ id: message.id, force: true })
 			try {
 				if (this.message.status !== STATUS_IMAP_SENT_MAILBOX_FAIL) {
 					await this.outboxStore.sendMessageWithUndo({ id: message.id })
@@ -160,13 +160,13 @@ export default {
 				}
 			} catch (error) {
 				logger.error('Could not send or copy message', { error })
-				if (error.data !== undefined) {
-					await this.outboxStore.updateMessage({ message: error.data[0], id: message.id })
-				}
 			}
 		},
 		async openModal() {
 			if (this.message.status === STATUS_IMAP_SENT_MAILBOX_FAIL) {
+				return
+			}
+			if (this.message.editorBody === null) {
 				return
 			}
 			await this.$store.dispatch('startComposerSession', {
