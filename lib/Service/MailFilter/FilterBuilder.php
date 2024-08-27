@@ -46,17 +46,17 @@ class FilterBuilder {
 			foreach ($filter['actions'] as $action) {
 				if ($action['type'] === 'fileinto') {
 					$extensions[] = 'fileinto';
-					$actions[] = sprintf(
-						'fileinto "%s";',
-						$action['mailbox']
-					);
+					$actions[] = sprintf('fileinto "%s";', $action['mailbox']);
 				}
 				if ($action['type'] === 'addflag') {
 					$extensions[] = 'imap4flags';
-					$actions[] = sprintf(
-						'addflag %s;',
-						$this->stringList($action['flag'])
-					);
+					$actions[] = sprintf('addflag %s;', $this->stringList($action['flag']));
+				}
+				if ($action['type'] === 'keep') {
+					$actions[] = 'keep;';
+				}
+				if ($action['type'] === 'stop') {
+					$actions[] = 'stop;';
 				}
 			}
 
