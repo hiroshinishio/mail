@@ -17,6 +17,8 @@ use OCA\Mail\Provider\MailService;
 use OCA\Mail\Service\AccountService;
 use OCP\Mail\Provider\Address as MailAddress;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class MailProviderTest extends TestCase {
 
@@ -24,19 +26,22 @@ class MailProviderTest extends TestCase {
 	private $containerInterface;
 	/** @var AccountServiceMockObject */
 	private $accountService;
+	/** @var LoggerInterface */
+	private $logger;
 
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->containerInterface = $this->createMock(ContainerInterface::class);
 		$this->accountService = $this->createMock(AccountService::class);
+		$this->logger = new NullLogger();
 
 	}
 
 	public function testId(): void {
 
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test set by constructor
 		$this->assertEquals('mail-application', $mailProvider->id());
 
@@ -45,7 +50,7 @@ class MailProviderTest extends TestCase {
 	public function testLabel(): void {
 		
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test set by constructor
 		$this->assertEquals('Mail Application', $mailProvider->label());
 
@@ -80,7 +85,7 @@ class MailProviderTest extends TestCase {
 				)
 			);
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test result with no services found
 		$this->assertFalse($mailProvider->hasServices('user0'));
 		// test result with services found
@@ -125,7 +130,7 @@ class MailProviderTest extends TestCase {
 				)
 			);
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test result with no services found
 		$this->assertEquals([], $mailProvider->listServices('user0'));
 		// test result with services found
@@ -170,7 +175,7 @@ class MailProviderTest extends TestCase {
 				)
 			);
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test result with no services found
 		$this->assertEquals(null, $mailProvider->findServiceById('user0', '100'));
 		// test result with services found
@@ -215,7 +220,7 @@ class MailProviderTest extends TestCase {
 				)
 			);
 		// construct mail provider
-		$mailProvider = new MailProvider($this->containerInterface, $this->accountService);
+		$mailProvider = new MailProvider($this->containerInterface, $this->accountService, $this->logger);
 		// test result with no services found
 		$this->assertEquals(null, $mailProvider->findServiceByAddress('user0', 'user0@testing.com'));
 		// test result with services found

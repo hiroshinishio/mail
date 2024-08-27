@@ -30,7 +30,7 @@ class MessageSend {
 	}
 
 	/**
-	 * performs send operation
+	 * Performs send operation
 	 *
 	 * @since 4.0.0
 	 *

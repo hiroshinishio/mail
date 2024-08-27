@@ -14,6 +14,7 @@ use OCP\Mail\Provider\Address as MailAddress;
 use OCP\Mail\Provider\IProvider;
 use OCP\Mail\Provider\IService;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class MailProvider implements IProvider {
 
@@ -21,12 +22,13 @@ class MailProvider implements IProvider {
 
 	public function __construct(
 		protected ContainerInterface $container,
-		protected AccountService $accountService
+		protected AccountService $accountService,
+		protected LoggerInterface $logger
 	) {
 	}
 
 	/**
-	 * arbitrary unique text string identifying this provider
+	 * Arbitrary unique text string identifying this provider
 	 *
 	 * @since 4.0.0
 	 *
@@ -37,7 +39,7 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * localized human friendly name of this provider
+	 * Localized human friendly name of this provider
 	 *
 	 * @since 4.0.0
 	 *
@@ -48,7 +50,7 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * determine if any services are configured for a specific user
+	 * Determine if any services are configured for a specific user
 	 *
 	 * @since 4.0.0
 	 *
@@ -61,7 +63,7 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * retrieve collection of services for a specific user
+	 * Retrieve collection of services for a specific user
 	 *
 	 * @since 4.0.0
 	 *
@@ -74,7 +76,8 @@ class MailProvider implements IProvider {
 		try {
 			// retrieve service(s) details from data store
 			$accounts = $this->accountService->findByUserId($userId);
-		} catch (\Throwable $th) {
+		} catch (\Throwable $e) {
+			$this->logger->error('Error occurred while retrieving mail account details', [ 'exception' => $e ]);
 			return [];
 		}
 		// construct temporary collection
@@ -82,7 +85,7 @@ class MailProvider implements IProvider {
 		// add services to collection
 		foreach ($accounts as $entry) {
 			// add service to collection
-			$services[$serviceId] = $this->serviceFromAccount($userId, $entry);
+			$services[(string)$entry->getId()] = $this->serviceFromAccount($userId, $entry);
 		}
 		// return list of services for user
 		return $services;
@@ -90,7 +93,7 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * retrieve a service with a specific id
+	 * Retrieve a service with a specific id
 	 *
 	 * @since 4.0.0
 	 *
@@ -110,7 +113,8 @@ class MailProvider implements IProvider {
 		try {
 			// retrieve service details from data store
 			$account = $this->accountService->find($userId, (int)$serviceId);
-		} catch(\Throwable $th) {
+		} catch(\Throwable $e) {
+			$this->logger->error('Error occurred while retrieving mail account details', [ 'exception' => $e ]);
 			return null;
 		}
 
@@ -120,7 +124,7 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * retrieve a service for a specific mail address
+	 * Retrieve a service for a specific mail address
 	 *
 	 * @since 4.0.0
 	 *
@@ -134,7 +138,8 @@ class MailProvider implements IProvider {
 		try {
 			// retrieve service details from data store
 			$accounts = $this->accountService->findByUserIdAndAddress($userId, $address);
-		} catch(\Throwable $th) {
+		} catch(\Throwable $e) {
+			$this->logger->error('Error occurred while retrieving mail account details', [ 'exception' => $e ]);
 			return null;
 		}
 		// evaluate if service details where found
@@ -148,20 +153,18 @@ class MailProvider implements IProvider {
 	}
 
 	/**
-	 * construct a new fresh service object
+	 * Construct a new fresh service object
 	 *
 	 * @since 4.0.0
 	 *
 	 * @return IService fresh service object
 	 */
 	public function initiateService(): IService {
-
 		return new MailService($this->container);
-
 	}
 
 	/**
-	 * construct a service object from a mail account
+	 * Construct a service object from a mail account
 	 *
 	 * @since 4.0.0
 	 *
