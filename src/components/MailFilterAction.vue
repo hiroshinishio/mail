@@ -59,9 +59,10 @@ export default {
 	data() {
 		return {
 			availableTypes: [
-				'fileinto',
 				'addflag',
+				'fileinto',
 				'keep',
+				'stop',
 			],
 		}
 	},
