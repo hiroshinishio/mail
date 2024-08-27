@@ -288,9 +288,9 @@
 					</NcButton>
 				</li>
 				<AccountSettings v-if="selectedAccount"
-								 :open.sync="showAccountSettings"
-								 :account="selectedAccount"
-								 @close="closeAccountSettings" />
+					:open.sync="showAccountSettings"
+					:account="selectedAccount"
+					@close="closeAccountSettings" />
 			</NcAppSettingsSection>
 		</NcAppSettingsDialog>
 	</div>
