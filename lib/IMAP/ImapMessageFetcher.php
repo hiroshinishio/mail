@@ -234,12 +234,12 @@ class ImapMessageFetcher {
 			if ($structure_type === 'multipart') {
 				$i = 1;
 				foreach ($structure->getParts() as $p) {
-					$this->getPart($p, (string)$i++, $isEncrypted || $isSigned);
+					$this->getPart($p, (string)$i++, !$this->loadBody || $isEncrypted || $isSigned);
 				}
 			} else {
 				$bodyPartId = $structure->findBody();
 				if (!is_null($bodyPartId)) {
-					$this->getPart($structure[$bodyPartId], $bodyPartId, $isEncrypted || $isSigned);
+					$this->getPart($structure[$bodyPartId], $bodyPartId, !$this->loadBody || $isEncrypted || $isSigned);
 				}
 			}
 		}
