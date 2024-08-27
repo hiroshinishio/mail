@@ -29,13 +29,10 @@
 <script>
 import { NcButton as ButtonVue, NcLoadingIcon as IconLoading, NcActionButton, NcListItem, NcButton } from '@nextcloud/vue'
 import IconCheck from 'vue-material-design-icons/Check.vue'
-import { Filter } from '../sieve/Filter'
-import { Test } from '../sieve/Test'
 import IconLock from 'vue-material-design-icons/Lock.vue'
 import MailFilterModal from './MailFilterModal.vue'
 import { randomId } from '../util/randomId'
 import logger from '../logger'
-import { Action } from '../sieve/Action'
 import { mapStores } from 'pinia'
 import useMailFilterStore from '../store/mailFilterStore'
 
