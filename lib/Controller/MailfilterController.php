@@ -11,13 +11,16 @@ namespace OCA\Mail\Controller;
 
 use Horde\ManageSieve\Exception as ManagesieveException;
 use OCA\Mail\AppInfo\Application;
+use OCA\Mail\Db\Alias;
+use OCA\Mail\Db\MailAccount;
 use OCA\Mail\Db\MailAccountMapper;
 use OCA\Mail\Db\MailboxMapper;
 use OCA\Mail\Exception\ClientException;
 use OCA\Mail\Exception\CouldNotConnectException;
 use OCA\Mail\Http\JsonResponse as MailJsonResponse;
 use OCA\Mail\Http\TrapError;
-use OCA\Mail\Service\MailFilter\Definition;
+use OCA\Mail\Service\AccountService;
+use OCA\Mail\Service\AliasesService;
 use OCA\Mail\Service\MailFilter\FilterBuilder;
 use OCA\Mail\Service\MailFilter\FilterParser;
 use OCA\Mail\Service\OutOfOffice\OutOfOfficeParser;
@@ -43,50 +46,53 @@ class MailfilterController extends OCSController {
 		private MailboxMapper $mailboxMapper,
 		private FilterParser $filterParser,
 		private OutOfOfficeParser $outOfOfficeParser,
+		private AccountService $accountService,
+		private AliasesService $aliasesService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 		$this->currentUserId = $UserId;
+	}
+
+	private function buildAllowedRecipients(MailAccount $mailAccount): array {
+		$aliases = $this->aliasesService->findAll($mailAccount->getId(), $mailAccount->getUserId());
+		$formattedAliases = array_map(static function (Alias $alias) {
+			return $alias->getAlias();
+		}, $aliases);
+		return array_merge([$mailAccount->getEmail()], $formattedAliases);
 	}
 
 	#[Route(Route::TYPE_FRONTPAGE, verb: 'GET', url: '/api/mailfilter/{accountId}', requirements: ['accountId' => '[\d]+'])]
 	public function getFilters(int $accountId) {
 		$script = $this->sieveService->getActiveScript($this->currentUserId, $accountId);
 
-		$result = $this->filterParser->parseSieve($script->getScript());
+		$result = $this->filterParser->parseFilterState($script->getScript());
 
 		return new JSONResponse($result->getFilters());
 	}
 
 	#[Route(Route::TYPE_FRONTPAGE, verb: 'PUT', url: '/api/mailfilter/{accountId}', requirements: ['accountId' => '[\d]+'])]
 	public function updateFilters(int $accountId, array $filters) {
-		$script = $this->sieveService->getActiveScript($this->currentUserId, $accountId);
+		$account = $this->accountService->find($this->currentUserId, $accountId);
 
+		$script = $this->sieveService->getActiveScript($account->getUserId(), $account->getId());
 
-
-		$oldState = $this->filterParser->parseSieve($script->getScript());
-
-		//		$newScript = $this->outOfOfficeParser->buildSieveScript(
-		//			$state,
-		//			$oldState->getUntouchedSieveScript(),
-		//			$this->buildAllowedRecipients($account),
-		//		);
-		//		try {
-		//			$this->sieveService->updateActiveScript($account->getUserId(), $account->getId(), $newScript);
-		//		} catch (ManageSieveException $e) {
-		//			$this->logger->error('Failed to save sieve script: ' . $e->getMessage(), [
-		//				'exception' => $e,
-		//				'script' => $newScript,
-		//			]);
-		//			throw $e;
-		//		}
-
-		//		$definition = new Definition($filters);
+		$oooState = $this->outOfOfficeParser->parseOutOfOfficeState($script->getScript());
+		$filterState = $this->filterParser->parseFilterState($oooState->getUntouchedSieveScript());
 
 		$sieve = new FilterBuilder();
-		$newScript = $sieve->buildSieve($filters, $oldState->getUntouchedSieveScript());
+		$newScript = $sieve->buildSieve(
+			$filters,
+			$filterState->getUntouchedSieveScript()
+		);
+
+		$newScript2 = $this->outOfOfficeParser->buildSieveScript(
+			$oooState->getState(),
+			$newScript,
+			$this->buildAllowedRecipients($account->getMailAccount())
+		);
 
 		try {
-			$this->sieveService->updateActiveScript($this->currentUserId, $accountId, $newScript);
+			$this->sieveService->updateActiveScript($this->currentUserId, $accountId, $newScript2);
 		} catch (ManageSieveException $e) {
 			$this->logger->error('Failed to save sieve script: ' . $e->getMessage(), [
 				'exception' => $e,

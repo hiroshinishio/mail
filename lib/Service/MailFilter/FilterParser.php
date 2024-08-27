@@ -24,7 +24,7 @@ class FilterParser {
 	/**
 	 * @throws FilterParserException
 	 */
-	public function parseSieve(string $sieveScript): FilterParserResult {
+	public function parseFilterState(string $sieveScript): FilterParserResult {
 		$filters = [];
 		$scriptOut = [];
 
@@ -64,7 +64,7 @@ class FilterParser {
 
 	/**
 	 * @param string[] $allowedRecipients Respond to envelopes that are addressed to the given addresses.
-	 *								      Should be the main address and aliases of the account.
+	 *                                    Should be the main address and aliases of the account.
 	 *                                    An empty array will leave the decision to the sieve implementation.
 	 *
 	 * @throws OutOfOfficeParserException If the given out-of-office state is missing required fields.
