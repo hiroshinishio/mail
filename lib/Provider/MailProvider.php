@@ -81,12 +81,8 @@ class MailProvider implements IProvider {
 		$services = [];
 		// add services to collection
 		foreach ($accounts as $entry) {
-			// extract values
-			$serviceId = (string)$entry->getId();
-			$label = $entry->getName();
-			$address = new MailAddress($entry->getEmail(), $entry->getName());
 			// add service to collection
-			$services[$serviceId] = new MailService($this->container, $userId, $serviceId, $label, $address);
+			$services[$serviceId] = $this->serviceFromAccount($userId, $entry);
 		}
 		// return list of services for user
 		return $services;
@@ -118,12 +114,8 @@ class MailProvider implements IProvider {
 			return null;
 		}
 
-		// extract values
-		$serviceId = (string)$account->getId();
-		$label = $account->getName();
-		$address = new MailAddress($account->getEmail(), $account->getName());
 		// return mail service object
-		return new MailService($this->container, $userId, $serviceId, $label, $address);
+		return $this->serviceFromAccount($userId, $account);
 
 	}
 
@@ -147,12 +139,8 @@ class MailProvider implements IProvider {
 		}
 		// evaluate if service details where found
 		if (isset($accounts[0])) {
-			// extract values
-			$serviceId = (string)$accounts[0]->getId();
-			$serviceLabel = $accounts[0]->getName();
-			$serviceAddress = new MailAddress($accounts[0]->getEmail(), $accounts[0]->getName());
 			// return mail service object
-			return new MailService($this->container, $userId, $serviceId, $serviceLabel, $serviceAddress);
+			return $this->serviceFromAccount($userId, $accounts[0]);
 		}
 
 		return null;
@@ -169,6 +157,27 @@ class MailProvider implements IProvider {
 	public function initiateService(): IService {
 
 		return new MailService($this->container);
+
+	}
+
+	/**
+	 * construct a service object from a mail account
+	 *
+	 * @since 4.0.0
+	 *
+	 * @param string $userId system user id
+	 * @param string $account mail account
+	 *
+	 * @return IService service object
+	 */
+	protected function serviceFromAccount(string $userId, Account $account): IService {
+
+		// extract values
+		$serviceId = (string)$account->getId();
+		$serviceLabel = $account->getName();
+		$serviceAddress = new MailAddress($account->getEmail(), $account->getName());
+		// return mail service object
+		return new MailService($this->container, $userId, $serviceId, $serviceLabel, $serviceAddress);
 
 	}
 
