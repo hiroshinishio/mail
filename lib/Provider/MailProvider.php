@@ -18,8 +18,6 @@ use Psr\Log\LoggerInterface;
 
 class MailProvider implements IProvider {
 
-	private ?array $ServiceCollection = [];
-
 	public function __construct(
 		protected ContainerInterface $container,
 		protected AccountService $accountService,
